@@ -3,16 +3,17 @@ import 'package:dnd_vault/entities/player-entity.dart';
 import 'package:dnd_vault/views/player-view.dart';
 import 'package:flutter/material.dart';
 
-class PlayersGridScreen extends StatefulWidget {
+class GridViewScreen extends StatefulWidget {
   final String userType;
+  final String optionChoseen;
 
-  const PlayersGridScreen({super.key, required this.userType});
+  const GridViewScreen({super.key, required this.userType,required this.optionChoseen});
 
   @override
-  State<PlayersGridScreen> createState() => _PlayersGridScreenState();
+  State<GridViewScreen> createState() => _GridViewScreenState();
 }
 
-class _PlayersGridScreenState extends State<PlayersGridScreen> {
+class _GridViewScreenState extends State<GridViewScreen> {
   List<PlayerEntity> players = [];
   bool isLoading = true;
 

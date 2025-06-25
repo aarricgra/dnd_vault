@@ -1,4 +1,4 @@
-import 'package:dnd_vault/views/players-grid.dart';
+import 'package:dnd_vault/views/grid-view.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -40,24 +40,16 @@ class HomeScreen extends StatelessWidget {
             final section = sections[index];
             return OutlinedButton(
               onPressed: () {
-                switch (section) {
-                  case 'Jugadores':
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => PlayersGridScreen(userType: userType),
-                      ),
-                    );
-                    break;
-                  default:
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Abrir: $section')),
-                    );
-                }
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => GridViewScreen(userType: userType,optionChoseen: section,),
+                  ),
+                );
               },
               style: OutlinedButton.styleFrom(
                 side: BorderSide(color: Colors.red.shade800, width: 2),
-                backgroundColor: const Color.fromARGB(255, 250, 237, 200), // más oscuro que #FFF8DC
+                backgroundColor: const Color.fromARGB(255, 250, 237, 200), 
                 padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
                 alignment: Alignment.centerLeft,
                 foregroundColor: Colors.red.shade800,
