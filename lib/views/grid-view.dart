@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dnd_vault/entities/character-entity.dart';
 import 'package:dnd_vault/entities/player-entity.dart';
 import 'package:dnd_vault/views/player-view.dart';
 import 'package:flutter/material.dart';
@@ -14,7 +15,7 @@ class GridViewScreen extends StatefulWidget {
 }
 
 class _GridViewScreenState extends State<GridViewScreen> {
-  List<PlayerEntity> players = [];
+  List<dynamic> players = [];
   bool isLoading = true;
 
   @override
@@ -24,9 +25,28 @@ class _GridViewScreenState extends State<GridViewScreen> {
   }
 
   Future<void> fetchPlayers() async {
-    final snapshot = await FirebaseFirestore.instance.collection('players').get();
+    String collectionName="";
+    switch(widget.optionChoseen){
+      case "Jugadores":
+        collectionName="players";
+        break;
+      case "Personajes":
+        collectionName="npcs";
+        break;
+      default:
+        break;
+    }
+    final snapshot = await FirebaseFirestore.instance.collection(collectionName).get();
     final loaded = snapshot.docs.map((doc) {
-      return PlayerEntity.fromMap(doc.data(), doc.id);
+      switch (collectionName){
+        case "players":
+          return PlayerEntity.fromMap(doc.data(), doc.id);
+        case "npcs":
+          return CharacterEntity.fromMap(doc.data());
+        default:
+          return List;
+      }
+      
     }).toList();
 
     setState(() {
