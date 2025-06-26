@@ -1,5 +1,6 @@
 import 'package:dnd_vault/views/grid-view.dart';
 import 'package:flutter/material.dart';
+import 'package:turn_page_transition/turn_page_transition.dart';
 
 class HomeScreen extends StatelessWidget {
   final String userType;
@@ -42,7 +43,9 @@ class HomeScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
+                  TurnPageRoute(
+                    overleafColor: const Color(0xFFFFF8DC), // opcional: color del reverso
+                    transitionDuration: const Duration(milliseconds: 1000), // opcional: duración
                     builder: (context) => GridViewScreen(userType: userType,optionChoseen: section,),
                   ),
                 );

@@ -1,7 +1,7 @@
 name: dnd_vault
 description: "A new Flutter project."
 publish_to: 'none'
-version: 1.0.006
+version: 1.0.009
 
 environment:
   sdk: ^3.7.0
@@ -14,6 +14,7 @@ dependencies:
   http: ^1.4.0
   js: ^0.7.2
   dio: ^5.8.0+1
+  turn_page_transition: ^0.4.0
 
 dev_dependencies:
   flutter_test:

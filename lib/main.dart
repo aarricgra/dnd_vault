@@ -2,6 +2,7 @@ import 'package:dnd_vault/screens/home-screen.dart';
 import 'package:dnd_vault/update_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:turn_page_transition/turn_page_transition.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -10,7 +11,7 @@ void main() async {
       apiKey: "AIzaSyAPKZ2BWXpfdjOFfRkzgOkNrNh7Rs5O0_4",
       authDomain: "dnd-vault.firebaseapp.com",
       projectId: "dnd-vault",
-      storageBucket: "dnd-vault.firebasestorage.app", // 🔧 CORREGIDO: .app → .appspot.com
+      storageBucket: "dnd-vault.appspot.com",
       messagingSenderId: "508424175231",
       appId: "1:508424175231:web:45514e2aef1a8d42fdc94a",
       measurementId: "G-YLDGKMV7TM",
@@ -46,13 +47,16 @@ class _EntryScreenState extends State<EntryScreen> {
   void goToHome(String userType) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => HomeScreen(userType: userType)),
+      TurnPageRoute(
+        overleafColor: const Color(0xFFFFF8DC),
+        transitionDuration: const Duration(milliseconds: 1000),
+        builder: (context) => HomeScreen(userType: userType),
+      ),
     );
   }
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     AutoUpdateService().updateIfNecessary();
   }
@@ -60,164 +64,156 @@ class _EntryScreenState extends State<EntryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF8DC), // Color pergamino real
-      appBar:
-          isMasterMode
-              ? AppBar(
-                backgroundColor: const Color(0xFFFFF8DC),
-                automaticallyImplyLeading: false,
-                leading: IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  color: Colors.red,
-                  onPressed: () {
-                    setState(() {
-                      isMasterMode = false;
-                      error = '';
-                      _passwordController.clear();
-                    });
-                  },
-                ),
-                elevation: 0,
-              )
-              : null,
-
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child:
-              isMasterMode
+      backgroundColor: Colors.transparent,
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: Image.asset(
+              "assets/images/Cover.png",
+              fit: BoxFit.cover,
+            ),
+          ),
+          if (isMasterMode)
+            Positioned(
+              top: 60,
+              left: 40,
+              child: IconButton(
+                icon: const Icon(Icons.arrow_back),
+                iconSize: 42,
+                color: const Color.fromARGB(255, 146, 101, 43),
+                onPressed: () {
+                  setState(() {
+                    isMasterMode = false;
+                    error = '';
+                    _passwordController.clear();
+                  });
+                },
+              ),
+            ),
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: isMasterMode
                   ? Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'Ingresa como Master',
-                        style: TextStyle(
-                          fontFamily: 'dndFont',
-                          fontSize: 32,
-                          color: Colors.brown.shade900,
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      TextField(
-                        controller: _passwordController,
-                        obscureText: true,
-                        decoration: const InputDecoration(
-                          labelText: 'Contraseña',
-                          border: OutlineInputBorder(),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      TextButton(
-                        onPressed: () {
-                          if (_passwordController.text == 'Asdf1234') {
-                            goToHome('master');
-                          } else {
-                            setState(() {
-                              error = 'Contraseña incorrecta';
-                            });
-                          }
-                        },
-                        style: ButtonStyle(
-                          overlayColor: MaterialStateProperty.all(
-                            Colors.transparent,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(height: 370,),
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFFF8DC),
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                          padding: MaterialStateProperty.all(
-                            const EdgeInsets.symmetric(vertical: 20.0),
+                          child: Column(
+                            children: [
+                              Text(
+                                'Ingresa como Master',
+                                style: TextStyle(
+                                  fontFamily: 'dndFont',
+                                  fontSize: 32,
+                                  color: Colors.brown.shade900,
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                              TextField(
+                                controller: _passwordController,
+                                obscureText: true,
+                                decoration: const InputDecoration(
+                                  filled: true,
+                                  fillColor: Color(0xFFFFF8DC),
+                                  labelText: 'Contraseña',
+                                  border: OutlineInputBorder(),
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                              TextButton(
+                                onPressed: () {
+                                  if (_passwordController.text == 'Asdf1234') {
+                                    goToHome('master');
+                                  } else {
+                                    setState(() {
+                                      error = 'Contraseña incorrecta';
+                                    });
+                                  }
+                                },
+                                style: ButtonStyle(
+                                  overlayColor: MaterialStateProperty.all(Colors.transparent),
+                                  padding: MaterialStateProperty.all(
+                                    const EdgeInsets.symmetric(vertical: 5.0),
+                                  ),
+                                ),
+                                child: Text(
+                                  'Acceder',
+                                  style: TextStyle(
+                                    fontFamily: 'dndFont',
+                                    fontSize: 62,
+                                    color: const Color.fromARGB(255, 146, 101, 43),
+                                  ),
+                                ),
+                              ),
+                              if (error.isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 8.0),
+                                  child: Text(
+                                    error,
+                                    style: const TextStyle(color: Colors.red),
+                                  ),
+                                ),
+                            ],
                           ),
                         ),
-                        child: Text(
-                          'Acceder',
-                          style: TextStyle(
-                            fontFamily: 'dndFont',
-                            fontSize: 32,
-                            color: Colors.red.shade800,
-                          ),
-                        ),
-                      ),
-
-                      if (error.isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8.0),
-                          child: Text(
-                            error,
-                            style: const TextStyle(color: Colors.red),
-                          ),
-                        ),
-                    ],
-                  )
+                      ],
+                    )
                   : Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Image.asset("assets/images/Dice.png", height: 160,width: 160,),
-                      SizedBox(height: 10,),
-                      Text(
-                        'Selecciona tu rol',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontFamily: 'dndFont',
-                          fontSize: 44,
-                          color: Colors.brown.shade900,
-                        ),
-                      ),
-                      const SizedBox(height: 60),
-
-                      // Botón JUGADOR
-                      TextButton(
-                        onPressed: () => goToHome('player'),
-                        style: ButtonStyle(
-                          overlayColor: MaterialStateProperty.all(
-                            Colors.transparent,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const SizedBox(height: 300),
+                        TextButton(
+                          onPressed: () => goToHome('player'),
+                          style: ButtonStyle(
+                            overlayColor: MaterialStateProperty.all(Colors.transparent),
+                            foregroundColor: MaterialStateProperty.all(Colors.red.shade800),
+                            padding: MaterialStateProperty.all(
+                              const EdgeInsets.symmetric(vertical: 5.0),
+                            ),
                           ),
-                          foregroundColor: MaterialStateProperty.all(
-                            Colors.red.shade800,
-                          ),
-                          padding: MaterialStateProperty.all(
-                            const EdgeInsets.symmetric(vertical: 20.0),
+                          child: Text(
+                            'Jugador',
+                            style: TextStyle(
+                              fontFamily: 'dndFont',
+                              fontSize: 62,
+                              color: const Color.fromARGB(255, 146, 101, 43),
+                            ),
                           ),
                         ),
-                        child: Text(
-                          'Jugador',
-                          style: TextStyle(
-                            fontFamily: 'dndFont',
-                            fontSize: 32,
-                            color: Colors.red.shade800,
+                        const SizedBox(height: 16),
+                        TextButton(
+                          onPressed: () {
+                            setState(() {
+                              isMasterMode = true;
+                            });
+                          },
+                          style: ButtonStyle(
+                            overlayColor: MaterialStateProperty.all(Colors.transparent),
+                            foregroundColor: MaterialStateProperty.all(Colors.red.shade800),
+                            padding: MaterialStateProperty.all(
+                              const EdgeInsets.symmetric(vertical: 5.0),
+                            ),
+                          ),
+                          child: Text(
+                            'Master',
+                            style: TextStyle(
+                              fontFamily: 'dndFont',
+                              fontSize: 62,
+                              color: const Color.fromARGB(255, 146, 101, 43),
+                            ),
                           ),
                         ),
-                      ),
-
-                      const SizedBox(height: 16),
-
-                      // Botón MASTER
-                      TextButton(
-                        onPressed: () {
-                          setState(() {
-                            isMasterMode = true;
-                          });
-                        },
-                        style: ButtonStyle(
-                          overlayColor: MaterialStateProperty.all(
-                            Colors.transparent,
-                          ),
-                          foregroundColor: MaterialStateProperty.all(
-                            Colors.red.shade800,
-                          ),
-                          padding: MaterialStateProperty.all(
-                            const EdgeInsets.symmetric(vertical: 20.0),
-                          ),
-                        ),
-                        child: Text(
-                          'Master',
-                          style: TextStyle(
-                            fontFamily: 'dndFont',
-                            fontSize: 32,
-                            color: Colors.red.shade800,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-        ),
+                      ],
+                    ),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dnd_vault/entities/character-entity.dart';
 import 'package:dnd_vault/entities/player-entity.dart';
+import 'package:dnd_vault/views/character-view.dart';
 import 'package:dnd_vault/views/player-view.dart';
 import 'package:flutter/material.dart';
+import 'package:turn_page_transition/turn_page_transition.dart';
 
 class GridViewScreen extends StatefulWidget {
   final String userType;
@@ -15,17 +17,18 @@ class GridViewScreen extends StatefulWidget {
 }
 
 class _GridViewScreenState extends State<GridViewScreen> {
-  List<dynamic> players = [];
+  List<dynamic> entitys = [];
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    fetchPlayers();
+    fetchentitys();
   }
 
-  Future<void> fetchPlayers() async {
+  Future<void> fetchentitys() async {
     String collectionName="";
+    print(widget.optionChoseen);
     switch(widget.optionChoseen){
       case "Jugadores":
         collectionName="players";
@@ -38,10 +41,12 @@ class _GridViewScreenState extends State<GridViewScreen> {
     }
     final snapshot = await FirebaseFirestore.instance.collection(collectionName).get();
     final loaded = snapshot.docs.map((doc) {
-      switch (collectionName){
-        case "players":
+      switch (widget.optionChoseen){
+        case "Jugadores":
+          print("entrar players");
           return PlayerEntity.fromMap(doc.data(), doc.id);
-        case "npcs":
+        case "Personajes":
+          print("entrar npcs");
           return CharacterEntity.fromMap(doc.data());
         default:
           return List;
@@ -50,7 +55,7 @@ class _GridViewScreenState extends State<GridViewScreen> {
     }).toList();
 
     setState(() {
-      players = loaded;
+      entitys = loaded;
       isLoading = false;
     });
   }
@@ -77,7 +82,7 @@ class _GridViewScreenState extends State<GridViewScreen> {
           : Padding(
               padding: const EdgeInsets.all(16.0),
               child: GridView.builder(
-                itemCount: players.length,
+                itemCount: entitys.length,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   crossAxisSpacing: 16,
@@ -85,16 +90,25 @@ class _GridViewScreenState extends State<GridViewScreen> {
                   childAspectRatio: 3 / 4,
                 ),
                 itemBuilder: (context, index) {
-                  final player = players[index];
+                  final entity = entitys[index];
                   return GestureDetector(
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                          builder: (_) => PlayerView(
-                            userType: widget.userType,
-                            player: player,
-                          ),
+                        TurnPageRoute(
+                          overleafColor: const Color(0xFFFFF8DC), // opcional: color del reverso
+                          transitionDuration: const Duration(milliseconds: 1000), // opcional: duración
+                          builder: (context) => 
+                          widget.optionChoseen=="Jugadores"?
+                            PlayerView(
+                              userType: widget.userType,
+                              player: entity,
+                            )
+                          :
+                            CharacterView(
+                              userType: widget.userType, 
+                              character: entity
+                            )
                         ),
                       );
                     },
@@ -112,7 +126,7 @@ class _GridViewScreenState extends State<GridViewScreen> {
                             child: ClipRRect(
                               borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
                               child: Image.network(
-                                player.portrait,
+                                entity.portrait,
                                 fit: BoxFit.cover,
                                 errorBuilder: (_, __, ___) => const Icon(Icons.broken_image),
                               ),
@@ -121,7 +135,10 @@ class _GridViewScreenState extends State<GridViewScreen> {
                           Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Text(
-                              player.shortName,
+                              widget.optionChoseen=="Jugadores"?
+                                entity.shortName
+                                :
+                                entity.name,
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontFamily: 'dndFont',
